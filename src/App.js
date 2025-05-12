@@ -1,6 +1,8 @@
 import './App.css';
 import { useState } from 'react';
 import CONFIG_OPTIONS from './configData';
+import configuratorImg from './assets/configurator.jpg';
+
 
 function App() {
   const [config, setConfig] = useState({
@@ -55,7 +57,7 @@ function App() {
         <h1 className="configurator__title">{CONFIG_OPTIONS.name}</h1>
         <div className="configurator__row">
           <div className="configurator__image">
-            <img src="./configurator.jpg" alt="alt" />
+            <img src={configuratorImg} alt="alt" />
           </div>
           <div className="configurator__content">
             {renderSelect('cpu', CONFIG_OPTIONS.cpu.title, CONFIG_OPTIONS.cpu.options, config.cpu, handleChange)}
