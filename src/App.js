@@ -1,7 +1,7 @@
 import './App.css';
 import { useState } from 'react';
 import CONFIG_OPTIONS from './configData';
-import configuratorImg from './assets/configurator.jpg';
+import configuratorImg from './assets/configurator.png';
 
 
 function App() {
@@ -54,10 +54,11 @@ function App() {
   return (
     <div className="App">
       <div className="configurator">
-        <h1 className="configurator__title">{CONFIG_OPTIONS.name}</h1>
         <div className="configurator__row">
-          <div className="configurator__image">
+          <div className="configurator__main">
             <img src={configuratorImg} alt="alt" />
+            <h1 className="configurator__title">{CONFIG_OPTIONS.name}</h1>
+            <div className="configurator__descr">Возможно изменить конфигурацию</div>
           </div>
           <div className="configurator__content">
             {renderSelect('cpu', CONFIG_OPTIONS.cpu.title, CONFIG_OPTIONS.cpu.options, config.cpu, handleChange)}
@@ -205,7 +206,8 @@ function App() {
             </label>
           </div>
         </div>
-        <div className="result-price">Стоимость: &nbsp;&nbsp; {calcTotal()} руб.</div>
+        <div className="result-price">Стоимость: &nbsp;&nbsp; <strong>{calcTotal()} руб.</strong></div>
+        <a href="#" class="btn-main">Заказать</a>
       </div>
     </div>
   );

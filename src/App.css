@@ -1,50 +1,64 @@
+
+.App {
+  min-height: 100vh;
+  background-color: #292b37;
+  color: #fff;
+}
 .configurator {
-  max-width: 1000px;
+  max-width: 400px;
   padding: 40px 15px;
   margin: 0 auto;
-  font: normal 12px Tahoma, Verdana, Segoe, sans-serif;
+  font: normal 16px Tahoma, Verdana, Segoe, sans-serif;
+}
+.configurator * {
+  box-sizing: border-box;
 }
 .configurator__title {
-  font-size: 30px;
+  font-size: 27px;
   line-height: 140%;
-  font-weight: 500;
-  margin-bottom: 30px;
+  font-weight: 300;
+  margin-bottom: 20px;
   margin-top: 0;
   text-align: center;
 }
-.configurator__row {
-  display: flex;
-  align-items: flex-start;
+.configurator__descr {
+  margin-bottom: 20px;
+  color: #8f919b;
+  text-align: center;
 }
-.configurator__image {
-  width: 35%;
-  padding-top: 50px;
+.configurator__row {
+  display: block;
+}
+.configurator__main {
+  width: 100%;
   flex: none;
 }
-.configurator__image img {
+.configurator__main img {
   max-width: 100%;
   height: auto;
+  transition: all 0.3s;
 }
 .configurator__content {
-  width: 65%;
-  padding-left: 20px;
-  flex: 1;
+  width: 100%;
 }
 .configurator__item {
-  margin-bottom: 8px;
-  color: #5a5a5a;
+  margin-bottom: 12px;
+  color: #8f919b;
   display: block;
 }
 .configurator__item select {
-  width: 100%;
-  padding: 2px 10px;
-  border: 1px solid rgb(118, 118, 118);
-  border-radius: 4px;
+  height: 30px;
+  background: #292b37;
+  border: 1px solid #8f919b;
+  font-size: 16px;
+  color: #fff;
+  font-weight: 400;
   cursor: pointer;
+  width: 100%;
 }
 .configurator__item p {
   margin: 0;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 .configurator__line {
   margin-bottom: 8px;
@@ -61,15 +75,18 @@
 .quantity {
   width: 82px;
   display: flex;
-  background: #fff;
+  background: transparent;
   border: 1px solid rgb(118, 118, 118);
-  line-height: 19px;
+  line-height: 30px;
 }
 .quantity input {
   flex: 1;
   width: 100%;
   border: none;
   text-align: center;
+  background: transparent;
+  color: #fff;
+  font-size: inherit;
 }
 .quantity__btn {
   font-size: 18px;
@@ -80,6 +97,7 @@
   justify-content: center;
   text-align: center;
   cursor: pointer;
+  color: #fff;
 }
 input[type=number] {
 	-webkit-appearance: none;
@@ -93,9 +111,16 @@ input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
+.configurator:hover .configurator__main img {
+  transform: scale(1.05);
+}
 .configurator__sum {
-  color: #000;
+  color: #fff;
   padding: 0 5px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   white-space: nowrap;
   border: 1px solid rgb(118, 118, 118);
   line-height: 19px;
@@ -103,28 +128,69 @@ input::-webkit-inner-spin-button {
 .btn-remove-line {
   line-height: 19px;
   padding: 0 10px;
+  height: 30px;
   font-size: 12px;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
   border: 1px solid rgb(118, 118, 118);
   cursor: pointer;
 }
 .btn-add-line {
   padding: 0 15px;
-  line-height: 19px;
+  height: 30px;
   border: 1px solid rgb(118, 118, 118);
   margin-top: 8px;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  color: #000;
+  color: #fff;
 }
 .btn-add-line strong {
-  font-size: 180%;
+  font-size: 160%;
+  margin-right: 10px;
   font-weight: 700;
 }
 .result-price {
   font: normal 19px Arial;
-  color: #800000;
-  margin-top: 10px;
+  margin-top: 18px;
+  color: #8f919b;
+  text-align: center;
+}
+.result-price strong {
+    font-size: 32px;
+    margin-top: 10px;
+    color: #ffaa06;
+    font-weight: 700;
+    display: block;
+    text-align: center;
+}
+.btn-main {
+  height: 43px;
+  color: #fff;
+  background: #ffaa06;
+  text-transform: uppercase;
+  width: 100%;
+  padding: 0 10px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+.btn-main:hover {
+    background: #e19503;
+}
+.configurator .btn-main {
+  margin-top: 20px;
 }
 
 @media only screen and (max-width : 768px) {
