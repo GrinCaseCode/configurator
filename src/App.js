@@ -1,5 +1,6 @@
 import './App.css';
 import { useState } from 'react';
+import { useEffect } from 'react';
 import CONFIG_OPTIONS from './configData';
 import configuratorImg from './assets/configurator.png';
 
@@ -17,7 +18,17 @@ function App() {
     disks: [{ index: 0, quantity: CONFIG_OPTIONS.disks.defaultQuantity }]
   });
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
+
+  useEffect(() => {
+  if (isModalOpen) {
+    document.body.classList.add('no-scroll');
+  } else {
+    document.body.classList.remove('no-scroll');
+  }
+
+}, [isModalOpen]);
 
   const handleChange = (key, value) => {
     setConfig(prev => ({ ...prev, [key]: value }));
@@ -44,8 +55,8 @@ function App() {
       <p>{title}</p>
       <select value={valueIndex} onChange={e => onChange(key, +e.target.value)}>
       <option disabled="disabled">Выберите значение</option>
-        {options.map((opt, idx) => (
-          <option key={idx} value={idx}>{opt.label}</option>
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
         ))}
       </select>
     </label>
@@ -88,8 +99,8 @@ function App() {
                   <option value="" disabled>
                     Выберите значение
                   </option>
-                  {CONFIG_OPTIONS.memory.options.map((opt, index) => (
-                    <option key={index} value={index}>
+                  {CONFIG_OPTIONS.memory.options.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
                       {opt.label}
                     </option>
                   ))}
@@ -160,8 +171,8 @@ function App() {
                       setConfig({ ...config, disks: newDisks });
                     }}
                   >
-                    {CONFIG_OPTIONS.disks.options.map((opt, idx) => (
-                      <option key={idx} value={idx}>{opt.label}</option>
+                    {CONFIG_OPTIONS.disks.options.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
                     ))}
                   </select>
                   <div className="quantity">
@@ -207,7 +218,115 @@ function App() {
           </div>
         </div>
         <div className="result-price">Стоимость: &nbsp;&nbsp; <strong>{calcTotal()} руб.</strong></div>
-        <a href="#" class="btn-main">Заказать</a>
+        <button className="btn-main" onClick={() => setIsModalOpen(true)}>Заказать</button>
+        {isModalOpen && (
+        <div className="modal">
+        <div className="modal__overlay" onClick={() => setIsModalOpen(false)}></div>
+          <div className="modal__content">
+            <div className="modal__close" onClick={() => setIsModalOpen(false)}>×</div>
+            <div className="modal__title">Форма заказа</div>
+            <div className="modal__feature">
+              <span>{CONFIG_OPTIONS.name}</span>
+            </div>
+            <div className="modal__feature">
+              <span>{CONFIG_OPTIONS.cpu.title}: </span>
+              {
+                CONFIG_OPTIONS.cpu.options.find(
+                  option => option.value === config.cpu
+                )?.label || 'Нет'
+              }
+            </div>
+            <div className="modal__feature">
+              <span>Память: </span>
+              {
+               CONFIG_OPTIONS.memory.options[config.memory.selectedIndex]?.label || 'Нет'  
+              } × {config.memory.quantity} шт.
+            </div>
+            <div className="modal__feature">
+              <span>{CONFIG_OPTIONS.raid.title}: </span>
+              {
+                CONFIG_OPTIONS.raid.options.find(
+                  option => option.value === config.raid
+                )?.label || 'Нет'
+              }
+            </div>
+            <div className="modal__feature">
+              <span>{CONFIG_OPTIONS.network.title}: </span>
+              {
+                CONFIG_OPTIONS.network.options.find(
+                  option => option.value === config.network
+                )?.label || 'Нет'
+              }
+            </div>
+            <div className="modal__feature">
+              <span>{CONFIG_OPTIONS.lowProfile.title}: </span>
+              {
+                CONFIG_OPTIONS.lowProfile.options.find(
+                  option => option.value === config.lowProfile
+                )?.label || 'Нет'
+              }
+            </div>
+            <div className="modal__feature">
+              <span>{CONFIG_OPTIONS.highProfile.title}: </span>
+              {
+                CONFIG_OPTIONS.highProfile.options.find(
+                  option => option.value === config.highProfile
+                )?.label || 'Нет'
+              }
+            </div>
+            <div className="modal__feature">
+              <span>{CONFIG_OPTIONS.rails.title}: </span>
+              {
+                CONFIG_OPTIONS.rails.options.find(
+                  option => option.value === config.rails
+                )?.label || 'Нет'
+              }
+            </div>
+            <div className="modal__feature">
+              <span>{CONFIG_OPTIONS.power.title}: </span>
+              {
+                CONFIG_OPTIONS.power.options.find(
+                  option => option.value === config.power
+                )?.label || 'Нет'
+              }
+            </div>
+            <div className="modal__feature">
+              <span>{CONFIG_OPTIONS.disks.title}: </span>
+              {
+                config.disks.filter(disk => Number(disk.index) !== 0).length === 0
+                  ? 'Нет'
+                  : config.disks
+                      .filter(disk => Number(disk.index) !== 0)
+                      .map((disk, i) => {
+                        const diskOption = CONFIG_OPTIONS.disks.options.find(opt => Number(opt.value) === Number(disk.index));
+                        return (
+                          <div key={i}>
+                            {diskOption?.label || 'Не выбрано'} × {disk.quantity} шт.
+                          </div>
+                        );
+                      })
+              }
+            </div>
+            <div className="result-price">Итоговая сумма: &nbsp;<strong>{calcTotal()} руб.</strong></div>
+            <br/>
+            <form>
+                <div className="item-form">
+                    <input type="text" required placeholder="Имя" />
+                </div>
+                <div className="item-form">
+                    <input type="email" required placeholder="E-mail" />
+                </div>
+                <div className="item-form">
+                    <input type="tel" required placeholder="Телефон" />
+                </div>
+                <div className="item-form">
+                    <textarea placeholder="Комментарий"></textarea>
+                </div>
+                <button className='btn-main'>Заказать</button>
+            </form>
+          </div>
+        </div>
+        )}
       </div>
     </div>
   );
