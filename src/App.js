@@ -62,8 +62,9 @@ function App() {
     </label>
   );
 
-  const getPreparedConfigJSON = () => {
+const getPreparedConfigJSON = () => {
   return JSON.stringify({
+    name: CONFIG_OPTIONS.name,
     cpu: CONFIG_OPTIONS.cpu.options.find(o => o.value === config.cpu)?.label,
     memory: {
       option: CONFIG_OPTIONS.memory.options[config.memory.selectedIndex]?.label,
