@@ -84,7 +84,7 @@ const getPreparedConfigJSON = () => {
       })),
     total: calcTotal()
   });
-};
+};  
 
   return (
     <div className="App">
@@ -347,12 +347,12 @@ const getPreparedConfigJSON = () => {
                     <textarea placeholder="Комментарий"></textarea>
                 </div>
                 <button className='btn-main'>Заказать</button>
-                <textarea
-                  name="configData"
+                <textarea 
+                  name="configData" 
                   value={getPreparedConfigJSON()}
-                  readOnly
+                  readOnly 
                   hidden
-                />
+                /> 
             </form>
           </div>
         </div>
