@@ -62,6 +62,29 @@ function App() {
     </label>
   );
 
+  const getPreparedConfigJSON = () => {
+  return JSON.stringify({
+    cpu: CONFIG_OPTIONS.cpu.options.find(o => o.value === config.cpu)?.label,
+    memory: {
+      option: CONFIG_OPTIONS.memory.options[config.memory.selectedIndex]?.label,
+      quantity: config.memory.quantity
+    },
+    raid: CONFIG_OPTIONS.raid.options.find(o => o.value === config.raid)?.label,
+    network: CONFIG_OPTIONS.network.options.find(o => o.value === config.network)?.label,
+    lowProfile: CONFIG_OPTIONS.lowProfile.options.find(o => o.value === config.lowProfile)?.label,
+    highProfile: CONFIG_OPTIONS.highProfile.options.find(o => o.value === config.highProfile)?.label,
+    rails: CONFIG_OPTIONS.rails.options.find(o => o.value === config.rails)?.label,
+    power: CONFIG_OPTIONS.power.options.find(o => o.value === config.power)?.label,
+    disks: config.disks
+      .filter(d => d.index !== 0)
+      .map(disk => ({
+        label: CONFIG_OPTIONS.disks.options.find(o => o.value === disk.index)?.label,
+        quantity: disk.quantity
+      })),
+    total: calcTotal()
+  });
+};
+
   return (
     <div className="App">
       <div className="configurator">
@@ -323,6 +346,12 @@ function App() {
                     <textarea placeholder="Комментарий"></textarea>
                 </div>
                 <button className='btn-main'>Заказать</button>
+                <textarea
+                  name="configData"
+                  value={getPreparedConfigJSON()}
+                  readOnly
+                  hidden
+                />
             </form>
           </div>
         </div>
