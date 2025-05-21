@@ -1,52 +1,65 @@
 
 import './App.css';
 import { useEffect, useState } from 'react';
-import jsonData from './config.json';
 
 function App() {
   const [configOptions, setConfigOptions] = useState(null);
   const [config, setConfig] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    const item = jsonData["62"];
-    const properties = item.PROPERTIES;
+  function transformItemToConfigOptions(item) {
+  const props = item.PROPERTIES;
+  const options = {};
 
-    const options = {};
-    for (const [key, prop] of Object.entries(properties)) {
-      options[key] = {
-        name: prop.name,
-        multiple: prop.multiple,
-        chetnoe: prop.chetnoe,
-        values: (prop.values || []).map((v, i) => ({
-          value: i,
-          title: v.title,
-          price: parseInt((v.price || '').replace(/\s/g, '')) || 0,
-          ramValue: parseInt((v.value || '').replace(/\s/g, '')) || null
-        }))
-      };
+  for (const [key, prop] of Object.entries(props)) {
+    options[key] = {
+      ...prop,
+      values: (prop.values || []).map((v, i) => ({
+        title: v.title,
+        price: parseInt(v.price || '0'),
+        value: i
+      }))
+    };
+  }
+
+  return options;
+}
+
+useEffect(() => {
+const rootDiv = document.getElementById('root');
+const jsonString = rootDiv?.getAttribute('data-parameters');
+
+  if (!jsonString) return;
+
+  const parsedData = JSON.parse(jsonString);
+  const item = parsedData["62"];
+
+  if (!item) return;
+
+  const options = transformItemToConfigOptions(item);
+  const properties = item.PROPERTIES;
+
+  setConfigOptions({
+    id: item.ID,
+    name: item.NAME,
+    image: item.PREVIEW_PICTURE,
+    basePrice: parseInt((item.PRICE || '').replace(/\s/g, '')) || 0,
+    options,
+    properties
+  });
+
+  const defaultConfig = {};
+  for (const [key, prop] of Object.entries(properties)) {
+    if (prop.multiple) {
+      defaultConfig[key] = [{ index: 0, quantity: 1 }];
+    } else if (key === "RAM") {
+      defaultConfig[key] = { selectedIndex: 0, quantity: prop.chetnoe ? 2 : 1 };
+    } else {
+      defaultConfig[key] = 0;
     }
-
-    setConfigOptions({
-      id: item.ID,
-      name: item.NAME,
-      image: item.PREVIEW_PICTURE,
-      basePrice: parseInt((item.PRICE || '').replace(/\s/g, '')) || 0,
-      options
-    });
-
-    const defaultConfig = {};
-    for (const [key, prop] of Object.entries(properties)) {
-      if (prop.multiple) {
-        defaultConfig[key] = [{ index: 0, quantity: 1 }];
-      } else if (key === "RAM") {
-        defaultConfig[key] = { selectedIndex: 0, quantity: prop.chetnoe ? 2 : 1 };
-      } else {
-        defaultConfig[key] = 0;
-      }
-    }
-    setConfig(defaultConfig);
-  }, []);
+  }
+  setConfig(defaultConfig);
+}, []);
 
   if (!configOptions || !config) return <div>Загрузка...</div>;
 
@@ -141,44 +154,6 @@ function App() {
     }
     return total;
   };
-
-  const getPreparedConfigJSON = () => {
-  const result = {
-    name: configOptions.name,
-    total: calcTotal(),
-    components: {},
-  };
-
-  Object.entries(configOptions.options).forEach(([key, property]) => {
-   if (property.multiple) {
-  const selected = config[key].filter(d => {
-    const opt = property.values[d.index];
-    return opt && opt.title.toLowerCase() !== "выберите значение";
-  });
-
-  result.components[key] = selected.map(d => ({
-    title: property.values[d.index]?.title || '',
-    quantity: d.quantity,
-    price: property.values[d.index]?.price || 0
-  }));
-} else if (key === "RAM") {
-      const ramOpt = property.values[config[key].selectedIndex];
-      result.components[key] = {
-        title: ramOpt?.title || '',
-        quantity: config[key].quantity,
-        price: ramOpt?.price || 0
-      };
-    } else {
-      const selected = property.values[config[key]];
-      result.components[key] = {
-        title: selected?.title || '',
-        price: selected?.price || 0
-      };
-    }
-  });
-
-  return JSON.stringify(result, null, 2); 
-};
 
   return (
     <div className="App">
@@ -329,12 +304,6 @@ function App() {
                   <textarea placeholder="Комментарий"></textarea>
                 </div>
                 <button className="btn-main">Заказать</button>
-                <textarea
-                  name="configData"
-                  value={getPreparedConfigJSON()}
-                  readOnly
-                  hidden
-                />
               </form>
             </div>
           </div>
