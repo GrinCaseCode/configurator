@@ -88,14 +88,14 @@
                 "multiple": false,
                 "values": [
                     {
-                        "value": "32",
-                        "price": "4400",
-                        "title": "HPE 32GB (1x32GB) Quad Rank x4 PC3-14900L (DDR3-1866) Load Reduced CAS-13 Memory Kit (712384-081)"
-                    },
-                    {
                         "value": "16",
                         "price": "2300",
                         "title": "HPE 16GB (1x16GB) Dual Rank x4 PC3-14900R (DDR3-1866) Registered CAS-13 Memory Kit (712383-081)"
+                    },
+                    {
+                        "value": "32",
+                        "price": "4400",
+                        "title": "HPE 32GB (1x32GB) Quad Rank x4 PC3-14900L (DDR3-1866) Load Reduced CAS-13 Memory Kit (712384-081)"
                     }
                 ]
             },
@@ -202,6 +202,10 @@
                 "multiple": true,
                 "values": [
                     {
+                        "price": "0",
+                        "title": "Выберите значение"
+                    },
+                    {
                         "price": "1150",
                         "title": "2.5\" HPE Tray Caddy Gen8/9 (651687-001) – новые (не оригинал)"
                     },
@@ -212,10 +216,6 @@
                     {
                         "price": "2900",
                         "title": "2.5\" Seagate Savvio 300Gb SAS 15000rpm 6G HDD (ST9300553SS)"
-                    },
-                    {
-                        "price": "0",
-                        "title": "Выберите значение"
                     }
                 ]
             }

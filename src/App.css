@@ -113,9 +113,6 @@ input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
-.configurator:hover .configurator__main img {
-  transform: scale(1.05);
-}
 .configurator__sum {
   color: #fff;
   padding: 0 5px;
