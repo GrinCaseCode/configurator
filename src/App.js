@@ -1,362 +1,345 @@
-import './App.css';
-import { useState } from 'react';
-import { useEffect } from 'react';
-import CONFIG_OPTIONS from './configData';
-import configuratorImg from './assets/configurator.png';
 
+import './App.css';
+import { useEffect, useState } from 'react';
+import jsonData from './config.json';
 
 function App() {
-  const [config, setConfig] = useState({
-    cpu: 0,
-    memory: { selectedIndex: 0, quantity: CONFIG_OPTIONS.memory.defaultQuantity },
-    raid: 0,
-    network: 0,
-    lowProfile: 0,
-    highProfile: 0,
-    rails: 0,
-    power: 0,
-    disks: [{ index: 0, quantity: CONFIG_OPTIONS.disks.defaultQuantity }]
-  });
-
+  const [configOptions, setConfigOptions] = useState(null);
+  const [config, setConfig] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-
   useEffect(() => {
-  if (isModalOpen) {
-    document.body.classList.add('no-scroll');
-  } else {
-    document.body.classList.remove('no-scroll');
-  }
+    const item = jsonData["62"];
+    const properties = item.PROPERTIES;
 
-}, [isModalOpen]);
+    const options = {};
+    for (const [key, prop] of Object.entries(properties)) {
+      options[key] = {
+        name: prop.name,
+        multiple: prop.multiple,
+        chetnoe: prop.chetnoe,
+        values: (prop.values || []).map((v, i) => ({
+          value: i,
+          title: v.title,
+          price: parseInt((v.price || '').replace(/\s/g, '')) || 0,
+          ramValue: parseInt((v.value || '').replace(/\s/g, '')) || null
+        }))
+      };
+    }
 
-  const handleChange = (key, value) => {
-    setConfig(prev => ({ ...prev, [key]: value }));
-  };
-
-  const calcTotal = () => {
-    let total = 0;
-    total += CONFIG_OPTIONS.cpu.options[config.cpu].price;
-    total += CONFIG_OPTIONS.memory.options[config.memory.selectedIndex].price * config.memory.quantity;
-    total += CONFIG_OPTIONS.raid.options[config.raid].price;
-    total += CONFIG_OPTIONS.network.options[config.network].price;
-    total += CONFIG_OPTIONS.lowProfile.options[config.lowProfile].price;
-    total += CONFIG_OPTIONS.highProfile.options[config.highProfile].price;
-    total += CONFIG_OPTIONS.rails.options[config.rails].price;
-    total += CONFIG_OPTIONS.power.options[config.power].price;
-    config.disks.forEach(d => {
-      total += CONFIG_OPTIONS.disks.options[d.index].price * d.quantity;
+    setConfigOptions({
+      id: item.ID,
+      name: item.NAME,
+      image: item.PREVIEW_PICTURE,
+      basePrice: parseInt((item.PRICE || '').replace(/\s/g, '')) || 0,
+      options
     });
-    return total;
-  };
 
-  const renderSelect = (key, title, options, valueIndex, onChange) => (
-    <label className="configurator__item">
-      <p>{title}</p>
-      <select value={valueIndex} onChange={e => onChange(key, +e.target.value)}>
-      <option disabled="disabled">Выберите значение</option>
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>{opt.label}</option>
+    const defaultConfig = {};
+    for (const [key, prop] of Object.entries(properties)) {
+      if (prop.multiple) {
+        defaultConfig[key] = [{ index: 0, quantity: 1 }];
+      } else if (key === "RAM") {
+        defaultConfig[key] = { selectedIndex: 0, quantity: prop.chetnoe ? 2 : 1 };
+      } else {
+        defaultConfig[key] = 0;
+      }
+    }
+    setConfig(defaultConfig);
+  }, []);
+
+  if (!configOptions || !config) return <div>Загрузка...</div>;
+
+  const renderSelect = (key, property) => (
+    <label className="configurator__item" key={key}>
+      <p>{property.name}</p>
+      <select
+        value={config[key]}
+        onChange={(e) =>
+          setConfig((prev) => ({ ...prev, [key]: +e.target.value }))
+        }
+      >
+        {property.values.map((opt, idx) => (
+          <option key={idx} value={idx}>
+            {opt.title} {opt.price ? `+ ${opt.price} руб.` : ''}
+          </option>
         ))}
       </select>
     </label>
   );
 
-const getPreparedConfigJSON = () => {
-  return JSON.stringify({
-    name: CONFIG_OPTIONS.name,
-    cpu: CONFIG_OPTIONS.cpu.options.find(o => o.value === config.cpu)?.label,
-    memory: {
-      option: CONFIG_OPTIONS.memory.options[config.memory.selectedIndex]?.label,
-      quantity: config.memory.quantity
-    },
-    raid: CONFIG_OPTIONS.raid.options.find(o => o.value === config.raid)?.label,
-    network: CONFIG_OPTIONS.network.options.find(o => o.value === config.network)?.label,
-    lowProfile: CONFIG_OPTIONS.lowProfile.options.find(o => o.value === config.lowProfile)?.label,
-    highProfile: CONFIG_OPTIONS.highProfile.options.find(o => o.value === config.highProfile)?.label,
-    rails: CONFIG_OPTIONS.rails.options.find(o => o.value === config.rails)?.label,
-    power: CONFIG_OPTIONS.power.options.find(o => o.value === config.power)?.label,
-    disks: config.disks
-      .filter(d => d.index !== 0)
-      .map(disk => ({
-        label: CONFIG_OPTIONS.disks.options.find(o => o.value === disk.index)?.label,
-        quantity: disk.quantity
-      })),
-    total: calcTotal()
+  const renderMultiple = (key, property) => (
+    <label className="configurator__item" key={key}>
+      <p>{property.name}</p>
+      {config[key].map((item, i) => (
+        <div className="configurator__line" key={i}>
+          <select
+            value={item.index}
+            onChange={(e) => {
+              const updated = [...config[key]];
+              updated[i].index = +e.target.value;
+              setConfig((prev) => ({ ...prev, [key]: updated }));
+            }}
+          >
+            {property.values.map((opt, idx) => (
+              <option key={idx} value={idx}>
+                {opt.title} {opt.price ? `+ ${opt.price} руб.` : ''}
+              </option>
+            ))}
+          </select>
+          <div className="quantity">
+            <div
+              className="quantity__btn quantity__btn-down"
+              onClick={() => {
+                const updated = [...config[key]];
+                updated[i].quantity = Math.max(1, updated[i].quantity - 1);
+                setConfig((prev) => ({ ...prev, [key]: updated }));
+              }}
+            >-</div>
+            <input type="number" value={item.quantity} readOnly />
+            <div
+              className="quantity__btn quantity__btn-up"
+              onClick={() => {
+                const updated = [...config[key]];
+                updated[i].quantity += 1;
+                setConfig((prev) => ({ ...prev, [key]: updated }));
+              }}
+            >+</div>
+          </div>
+          {i > 0 && (
+            <div className="btn-remove-line" onClick={() => {
+              const updated = config[key].filter((_, idx) => idx !== i);
+              setConfig((prev) => ({ ...prev, [key]: updated }));
+            }}>X</div>
+          )}
+        </div>
+      ))}
+      <div className="btn-add-line" onClick={() => {
+        setConfig(prev => ({
+          ...prev,
+          [key]: [...prev[key], { index: 0, quantity: 1 }]
+        }));
+      }}>
+        <strong>+</strong> Добавить ещё
+      </div>
+    </label>
+  );
+
+  const calcTotal = () => {
+    let total = configOptions.basePrice || 0;
+    for (const [key, prop] of Object.entries(configOptions.options)) {
+      if (prop.multiple) {
+        config[key].forEach((item) => {
+          total += (prop.values[item.index]?.price || 0) * item.quantity;
+        });
+      } else if (key === "RAM") {
+        const selected = config[key].selectedIndex;
+        total += (prop.values[selected]?.price || 0) * config[key].quantity;
+      } else {
+        total += prop.values[config[key]]?.price || 0;
+      }
+    }
+    return total;
+  };
+
+  const getPreparedConfigJSON = () => {
+  const result = {
+    name: configOptions.name,
+    total: calcTotal(),
+    components: {},
+  };
+
+  Object.entries(configOptions.options).forEach(([key, property]) => {
+   if (property.multiple) {
+  const selected = config[key].filter(d => {
+    const opt = property.values[d.index];
+    return opt && opt.title.toLowerCase() !== "выберите значение";
   });
-};  
+
+  result.components[key] = selected.map(d => ({
+    title: property.values[d.index]?.title || '',
+    quantity: d.quantity,
+    price: property.values[d.index]?.price || 0
+  }));
+} else if (key === "RAM") {
+      const ramOpt = property.values[config[key].selectedIndex];
+      result.components[key] = {
+        title: ramOpt?.title || '',
+        quantity: config[key].quantity,
+        price: ramOpt?.price || 0
+      };
+    } else {
+      const selected = property.values[config[key]];
+      result.components[key] = {
+        title: selected?.title || '',
+        price: selected?.price || 0
+      };
+    }
+  });
+
+  return JSON.stringify(result, null, 2); 
+};
 
   return (
     <div className="App">
       <div className="configurator">
-        <div className="configurator__row">
-          <div className="configurator__main">
-            <img src={configuratorImg} alt="alt" />
-            <h1 className="configurator__title">{CONFIG_OPTIONS.name}</h1>
-            <div className="configurator__descr">Возможно изменить конфигурацию</div>
-          </div>
-          <div className="configurator__content">
-            {renderSelect('cpu', CONFIG_OPTIONS.cpu.title, CONFIG_OPTIONS.cpu.options, config.cpu, handleChange)}
-
-            <label className="configurator__item">
-              <p>{CONFIG_OPTIONS.memory.title}</p>
-              <div className="configurator__line">
-                <div className="configurator__sum">
-                  {config.memory.selectedIndex !== null
-                    ? config.memory.quantity * CONFIG_OPTIONS.memory.options[config.memory.selectedIndex].valueMemory
-                    : 0} GB
-                </div>
-
-                <select
-                  value={config.memory.selectedIndex ?? ''}
-                  onChange={(e) => {
-                    const selectedIndex = parseInt(e.target.value, 10);
-                    setConfig((prev) => ({
-                      ...prev,
-                      memory: {
-                        ...prev.memory,
-                        selectedIndex,
-                      },
-                    }));
-                  }}
-                >
-                  <option value="" disabled>
-                    Выберите значение
-                  </option>
-                  {CONFIG_OPTIONS.memory.options.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-
-                <div className="quantity">
-                  <div
-                    className="quantity__btn quantity__btn-down"
-                    onClick={() => {
-                      setConfig((prev) => {
-                        const newQty = Math.max(
-                          prev.memory.quantity - CONFIG_OPTIONS.memory.quantityStep,
-                          CONFIG_OPTIONS.memory.minQuantity
-                        );
-                        return {
-                          ...prev,
-                          memory: {
-                            ...prev.memory,
-                            quantity: newQty,
-                          },
-                        };
-                      });
-                    }}
-                  >
-                    -
-                  </div>
-                  <input
-                    type="number"
-                    step={CONFIG_OPTIONS.memory.quantityStep}
-                    min={CONFIG_OPTIONS.memory.minQuantity}
-                    value={config.memory.quantity}
-                    readOnly
-                  />
-                  <div
-                    className="quantity__btn quantity__btn-up"
-                    onClick={() => {
-                      setConfig((prev) => ({
-                        ...prev,
-                        memory: {
-                          ...prev.memory,
-                          quantity: prev.memory.quantity + CONFIG_OPTIONS.memory.quantityStep,
-                        },
-                      }));
-                    }}
-                  >
-                    +
-                  </div>
-                </div>
-              </div>
-            </label>
-
-            {renderSelect('raid', CONFIG_OPTIONS.raid.title, CONFIG_OPTIONS.raid.options, config.raid, handleChange)}
-            {renderSelect('network', CONFIG_OPTIONS.network.title, CONFIG_OPTIONS.network.options, config.network, handleChange)}
-            {renderSelect('lowProfile', CONFIG_OPTIONS.lowProfile.title, CONFIG_OPTIONS.lowProfile.options, config.lowProfile, handleChange)}
-            {renderSelect('highProfile', CONFIG_OPTIONS.highProfile.title, CONFIG_OPTIONS.highProfile.options, config.highProfile, handleChange)}
-            {renderSelect('rails', CONFIG_OPTIONS.rails.title, CONFIG_OPTIONS.rails.options, config.rails, handleChange)}
-            {renderSelect('power', CONFIG_OPTIONS.power.title, CONFIG_OPTIONS.power.options, config.power, handleChange)}
-
-            <label className="configurator__item">
-              <p>{CONFIG_OPTIONS.disks.title}</p>
-              {config.disks.map((disk, i) => (
-                <div className="configurator__line" key={i}>
-                  <select
-                    value={disk.index}
-                    onChange={e => {
-                      const newDisks = [...config.disks];
-                      newDisks[i].index = +e.target.value;
-                      setConfig({ ...config, disks: newDisks });
-                    }}
-                  >
-                    {CONFIG_OPTIONS.disks.options.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
-                  <div className="quantity">
-                    <div
-                      className="quantity__btn quantity__btn-down"
-                      onClick={() => {
-                        const newDisks = [...config.disks];
-                        newDisks[i].quantity = Math.max(CONFIG_OPTIONS.disks.minQuantity, newDisks[i].quantity - CONFIG_OPTIONS.disks.quantityStep);
-                        setConfig({ ...config, disks: newDisks });
-                      }}
-                    >-</div>
-                    <input type="number" value={disk.quantity} readOnly />
-                    <div
-                      className="quantity__btn quantity__btn-up"
-                      onClick={() => {
-                        const newDisks = [...config.disks];
-                        newDisks[i].quantity += CONFIG_OPTIONS.disks.quantityStep;
-                        setConfig({ ...config, disks: newDisks });
-                      }}
-                    >+</div>
-                  </div>
-                  {i >= 0 && (
-                    <div
-                      className="btn-remove-line"
-                      onClick={() => {
-                        const newDisks = config.disks.filter((_, idx) => idx !== i);
-                        setConfig({ ...config, disks: newDisks });
-                      }}
-                    >X</div>
-                  )}
-                </div>
-              ))}
-              <div
-                className="btn-add-line"
-                onClick={() => setConfig({
-                  ...config,
-                  disks: [...config.disks, { index: 0, quantity: CONFIG_OPTIONS.disks.defaultQuantity }]
-                })}
-              >
-                <strong>+</strong> Добавить еще
-              </div>
-            </label>
-          </div>
+        <div className="configurator__main">
+          <img src={configOptions.image} alt={configOptions.name} />
+          <h1 className="configurator__title">{configOptions.name}</h1>
         </div>
-        <div className="result-price">Стоимость: &nbsp;&nbsp; <strong>{calcTotal()} руб.</strong></div>
+        <div className="configurator__content">
+          {Object.entries(configOptions.options).map(([key, property]) => {
+            if (property.multiple) return renderMultiple(key, property);
+            if (key === "RAM") {
+              const label = property.values[config[key].selectedIndex]?.title || '';
+              const match = [...label.matchAll(/(\d+)GB/gi)].map(m => parseInt(m[1]));
+              const gb = match.length > 0 ? Math.max(...match) : 0;
+              return (
+                <label className="configurator__item" key={key}>
+                  <p>{property.name}</p>
+                  <div className="configurator__line">
+                    <div className="configurator__sum">{gb * config[key].quantity} GB</div>
+                    <select
+                      value={config[key].selectedIndex}
+                      onChange={(e) => {
+                        const selectedIndex = parseInt(e.target.value, 10);
+                        setConfig((prev) => ({
+                          ...prev,
+                          [key]: {
+                            ...prev[key],
+                            selectedIndex,
+                          },
+                        }));
+                      }}
+                    >
+                      {property.values.map((opt, idx) => (
+                        <option key={idx} value={idx}>
+                          {opt.title} + {opt.price} руб.
+                        </option>
+                      ))}
+                    </select>
+                    <div className="quantity">
+                      <div
+                        className="quantity__btn quantity__btn-down"
+                        onClick={() =>
+                          setConfig((prev) => ({
+                            ...prev,
+                            [key]: {
+                              ...prev[key],
+                              quantity: Math.max(1, prev[key].quantity - (property.chetnoe ? 2 : 1)),
+                            },
+                          }))
+                        }
+                      >
+                        -
+                      </div>
+                      <input type="number" value={config[key].quantity} readOnly />
+                      <div
+                        className="quantity__btn quantity__btn-up"
+                        onClick={() =>
+                          setConfig((prev) => ({
+                            ...prev,
+                            [key]: {
+                              ...prev[key],
+                              quantity: prev[key].quantity + (property.chetnoe ? 2 : 1),
+                            },
+                          }))
+                        }
+                      >
+                        +
+                      </div>
+                    </div>
+                  </div>
+                </label>
+              );
+            } else {
+              return renderSelect(key, property);
+            }
+          })}
+        </div>
+        <div className="result-price">Стоимость: <strong>{calcTotal()} руб.</strong></div>
         <button className="btn-main" onClick={() => setIsModalOpen(true)}>Заказать</button>
         {isModalOpen && (
-        <div className="modal">
-        <div className="modal__overlay" onClick={() => setIsModalOpen(false)}></div>
-          <div className="modal__content">
-            <div className="modal__close" onClick={() => setIsModalOpen(false)}>×</div>
-            <div className="modal__title">Форма заказа</div>
-            <div className="modal__feature">
-              <span>{CONFIG_OPTIONS.name}</span>
-            </div>
-            <div className="modal__feature">
-              <span>{CONFIG_OPTIONS.cpu.title}: </span>
-              {
-                CONFIG_OPTIONS.cpu.options.find(
-                  option => option.value === config.cpu
-                )?.label || 'Нет'
-              }
-            </div>
-            <div className="modal__feature">
-              <span>Память: </span>
-              {
-               CONFIG_OPTIONS.memory.options[config.memory.selectedIndex]?.label || 'Нет'  
-              } × {config.memory.quantity} шт.
-            </div>
-            <div className="modal__feature">
-              <span>{CONFIG_OPTIONS.raid.title}: </span>
-              {
-                CONFIG_OPTIONS.raid.options.find(
-                  option => option.value === config.raid
-                )?.label || 'Нет'
-              }
-            </div>
-            <div className="modal__feature">
-              <span>{CONFIG_OPTIONS.network.title}: </span>
-              {
-                CONFIG_OPTIONS.network.options.find(
-                  option => option.value === config.network
-                )?.label || 'Нет'
-              }
-            </div>
-            <div className="modal__feature">
-              <span>{CONFIG_OPTIONS.lowProfile.title}: </span>
-              {
-                CONFIG_OPTIONS.lowProfile.options.find(
-                  option => option.value === config.lowProfile
-                )?.label || 'Нет'
-              }
-            </div>
-            <div className="modal__feature">
-              <span>{CONFIG_OPTIONS.highProfile.title}: </span>
-              {
-                CONFIG_OPTIONS.highProfile.options.find(
-                  option => option.value === config.highProfile
-                )?.label || 'Нет'
-              }
-            </div>
-            <div className="modal__feature">
-              <span>{CONFIG_OPTIONS.rails.title}: </span>
-              {
-                CONFIG_OPTIONS.rails.options.find(
-                  option => option.value === config.rails
-                )?.label || 'Нет'
-              }
-            </div>
-            <div className="modal__feature">
-              <span>{CONFIG_OPTIONS.power.title}: </span>
-              {
-                CONFIG_OPTIONS.power.options.find(
-                  option => option.value === config.power
-                )?.label || 'Нет'
-              }
-            </div>
-            <div className="modal__feature">
-              <span>{CONFIG_OPTIONS.disks.title}: </span>
-              {
-                config.disks.filter(disk => Number(disk.index) !== 0).length === 0
-                  ? 'Нет'
-                  : config.disks
-                      .filter(disk => Number(disk.index) !== 0)
-                      .map((disk, i) => {
-                        const diskOption = CONFIG_OPTIONS.disks.options.find(opt => Number(opt.value) === Number(disk.index));
-                        return (
-                          <div key={i}>
-                            {diskOption?.label || 'Не выбрано'} × {disk.quantity} шт.
-                          </div>
-                        );
-                      })
-              }
-            </div>
-            <div className="result-price">Итоговая сумма: &nbsp;<strong>{calcTotal()} руб.</strong></div>
-            <br/>
-            <form>
+          <div className="modal">
+            <div className="modal__overlay" onClick={() => setIsModalOpen(false)}></div>
+            <div className="modal__content">
+              <div className="modal__close" onClick={() => setIsModalOpen(false)}>×</div>
+              <div className="modal__title">Форма заказа</div>
+
+              <div className="modal__feature">
+                <strong>{configOptions.name}</strong>
+              </div>
+
+              {Object.entries(configOptions.options).map(([key, property]) => {
+                if (property.multiple) {
+                  const selected = config[key].filter(d => {
+                    const opt = property.values[d.index];
+                    return opt && opt.title.toLowerCase() !== "выберите значение";
+                  });
+                  return (
+                    <div className="modal__feature" key={key}>
+                      <span>{property.name}:</span>{' '}
+                      {selected.length === 0
+                        ? 'Нет'
+                        : selected.map((d, i) => {
+                            const item = property.values[d.index];
+                            return (
+                              <div key={i}>
+                                {item?.title || 'Не выбрано'} × {d.quantity} шт.
+                              </div>
+                            );
+                          })}
+                    </div>
+                  );
+                }
+
+                if (key === 'RAM') {
+                  const selected = property.values[config[key].selectedIndex];
+                  return (
+                    <div className="modal__feature" key={key}>
+                      <span>{property.name}:</span>{' '}
+                      {selected?.title || 'Нет'} × {config[key].quantity} шт.
+                    </div>
+                  );
+                }
+
+                const item = property.values[config[key]];
+                return (
+                  <div className="modal__feature" key={key}>
+                    <span>{property.name}:</span> {item?.title || 'Нет'}
+                  </div>
+                );
+              })}
+
+              <div className="result-price">
+                Итоговая сумма: <strong>{calcTotal()} руб.</strong>
+              </div>
+
+              <form>
                 <div className="item-form">
-                    <input type="text" required placeholder="Имя" />
+                  <input type="text" required placeholder="Имя" />
                 </div>
                 <div className="item-form">
-                    <input type="email" required placeholder="E-mail" />
+                  <input type="email" required placeholder="E-mail" />
                 </div>
                 <div className="item-form">
-                    <input type="tel" required placeholder="Телефон" />
+                  <input type="tel" required placeholder="Телефон" />
                 </div>
                 <div className="item-form">
-                    <textarea placeholder="Комментарий"></textarea>
+                  <textarea placeholder="Комментарий"></textarea>
                 </div>
-                <button className='btn-main'>Заказать</button>
-                <textarea 
-                  name="configData" 
-                  value={getPreparedConfigJSON()}
-                  readOnly 
-                  hidden
-                /> 
-            </form>
+                <button className="btn-main">Заказать</button>
+               <textarea
+                name="configData"
+                value={getPreparedConfigJSON()}
+                readOnly
+                hidden
+              />
+              </form>
+            </div>
           </div>
-        </div>
         )}
+
       </div>
     </div>
   );
