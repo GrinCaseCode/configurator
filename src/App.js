@@ -329,12 +329,12 @@ function App() {
                   <textarea placeholder="Комментарий"></textarea>
                 </div>
                 <button className="btn-main">Заказать</button>
-               <textarea
-                name="configData"
-                value={getPreparedConfigJSON()}
-                readOnly
-                hidden
-              />
+                <textarea
+                  name="configData"
+                  value={getPreparedConfigJSON()}
+                  readOnly
+                  hidden
+                />
               </form>
             </div>
           </div>
