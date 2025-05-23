@@ -5,16 +5,18 @@
   color: #fff;
 }
 .configurator {
-  max-width: 400px;
   padding: 40px 15px;
   margin: 0 auto;
   font: normal 16px Tahoma, Verdana, Segoe, sans-serif;
+  display: flex; 
+  flex-direction: column;
+  align-items: flex-start;
 }
 .configurator * {
   box-sizing: border-box;
 }
 .configurator__title {
-  font-size: 27px;
+  font-size: 23px;
   line-height: 140%;
   font-weight: 300;
   margin-bottom: 20px;
@@ -155,7 +157,9 @@ input::-webkit-inner-spin-button {
 }
 .result-price {
   font: normal 19px Arial;
-  margin-top: 18px;
+  padding-top: 18px;
+  margin-top: auto;
+  width: 100%;
   color: #8f919b;
   text-align: center;
 }
@@ -286,6 +290,29 @@ input::-webkit-inner-spin-button {
 .no-scroll {
   overflow: hidden;
 }
+.row-main {
+  margin: 0 -15px;
+  margin-bottom: -30px;
+  display: flex;
+  flex-wrap: wrap;
+}
+.row-main .configurator {
+  padding: 0 15px;
+  width: 33.3333%;
+  margin: 0;
+  margin-bottom: 30px;
+}
+.container {
+  max-width: 1000px;
+  padding: 50px 15px;
+  margin: 0 auto;
+} 
+
+@media only screen and (max-width : 992px) {
+  .row-main .configurator {
+    width: 50%;
+  }
+}
 
 @media only screen and (max-width : 768px) {
   .configurator__row { 
@@ -314,5 +341,8 @@ input::-webkit-inner-spin-button {
   }
   .modal__content {
     padding: 25px 15px;
+  }
+  .row-main .configurator {
+    width: 100%;
   }
 }
