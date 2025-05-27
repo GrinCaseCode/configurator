@@ -13,7 +13,8 @@ function transformItemToConfigOptions(item) {
       values: prop.values.map((v, i) => ({
         title: v.title,
         price: parseInt(v.price || '0'),
-        value: i
+        value: i,
+        count: v.count ? parseInt(v.count) : null
       }))
     };
   }
@@ -30,7 +31,7 @@ function App() {
     if (!jsonString) return;
 
     const parsedData = JSON.parse(jsonString);
-    const configs = [];
+    const configs = []; 
 
     for (const item of Object.values(parsedData)) {
       const options = transformItemToConfigOptions(item);
@@ -61,8 +62,6 @@ function App() {
     setConfigData(configs);
   }, []);
 
-  if (configData.length === 0) return <div>Загрузка...</div>;
-
   const updateConfig = (index, newConfig) => {
     setConfigData(prev =>
       prev.map((item, i) => i === index ? { ...item, config: newConfig } : item)
@@ -86,7 +85,12 @@ function App() {
         });
       } else if (key === 'RAM') {
         const sel = config[key].selectedIndex;
-        total += (prop.values[sel]?.price || 0) * config[key].quantity;
+        const ramOption = prop.values[sel];
+        if (ramOption?.count) { 
+          total += ramOption.price || 0;
+        } else {
+          total += (ramOption?.price || 0) * config[key].quantity;
+        }
       } else {
         total += prop.values[config[key]]?.price || 0;
       }
@@ -315,11 +319,11 @@ function App() {
   };
 
   return (
-    <div className="App"> 
+    <div className="App">
       <div className="container">
-          <div className="row-main">
-            {configData.map((item, index) => renderConfigurator(item, index))}
-          </div>
+        <div className="row-main">
+          {configData.map((item, index) => renderConfigurator(item, index))}
+        </div>
       </div>
     </div>
   );
