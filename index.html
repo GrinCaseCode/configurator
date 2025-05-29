@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="/configurator/favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Web site created using create-react-app"/><link rel="apple-touch-icon" href="/configurator/logo192.png"/><link rel="manifest" href="/configurator/manifest.json"/><title>React App</title><script defer="defer" src="/configurator/static/js/main.ef6f2afd.js"></script><link href="/configurator/static/css/main.7917d32f.css" rel="stylesheet"></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root" data-parameters='{
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="/configurator/favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Web site created using create-react-app"/><link rel="apple-touch-icon" href="/configurator/logo192.png"/><link rel="manifest" href="/configurator/manifest.json"/><title>React App</title><script defer="defer" src="/configurator/static/js/main.8d772b77.js"></script><link href="/configurator/static/css/main.2c90a832.css" rel="stylesheet"></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root" data-parameters='{
     "61": {
         "NAME": "HPE Proliant BL460с Gen8",
         "ID": "61",
@@ -74,10 +74,18 @@
                 "code": "PROCESSORS",
                 "chetnoe": false,
                 "multiple": false,
+                "count": false,
+                "min": 1,
+                "max": 2,
                 "values": [
                     {
                         "price": "0",
                         "title": "2 x Xeon E5-2470v2 10-core (2.4 GHz, Ivy Bridge EN, 25Mb, 95W)"
+                    },
+                    {
+                        "price": 0,
+                        "title": "1 x Xeon E3-1585Lv5 (4 x 3.1GHz), видеокарта  Intel Iris Pro Graphics P580",
+                        "value": 16
                     }
                 ]
             },
@@ -201,11 +209,9 @@
                 "code": "DISKS",
                 "chetnoe": false,
                 "multiple": true,
+                "min": 1,
+                "max": 6,
                 "values": [
-                  {
-                        "price": "0",
-                        "title": "Выберите значение"
-                    },
                     {
                         "price": "1150",
                         "title": "2.5\" HPE Tray Caddy Gen8/9 (651687-001) – новые (не оригинал)"
@@ -217,6 +223,10 @@
                     {
                         "price": "2900",
                         "title": "2.5\" Seagate Savvio 300Gb SAS 15000rpm 6G HDD (ST9300553SS)"
+                    },
+                    {
+                        "price": "0",
+                        "title": "Выберите значение"
                     }
                 ]
             }
@@ -1180,10 +1190,6 @@
                 "chetnoe": false,
                 "multiple": true,
                 "values": [
-                  {
-                        "price": "0",
-                        "title": "Выберите значение"
-                    },
                     {
                         "price": "1150",
                         "title": "2.5\" HPE Tray Caddy Gen8/9 (651687-001) – новые (не оригинал)"
@@ -1195,6 +1201,10 @@
                     {
                         "price": "2900",
                         "title": "2.5\" Seagate Savvio 300Gb SAS 15000rpm 6G HDD (ST9300553SS)"
+                    },
+                    {
+                        "price": "0",
+                        "title": "Выберите значение"
                     }
                 ]
             }
