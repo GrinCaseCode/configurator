@@ -20,9 +20,9 @@ function transformItemToConfigOptions(item) {
       values.length > 0 &&
       parseInt(values[0].price || '0') !== 0
     ) {
-      values.unshift({
+      values.unshift({  
         title: 'Нет',
-        price: 0,
+        price: 0, 
         value: 0
       });
     }
