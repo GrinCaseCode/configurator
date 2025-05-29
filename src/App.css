@@ -8,9 +8,6 @@
   padding: 40px 15px;
   margin: 0 auto;
   font: normal 16px Tahoma, Verdana, Segoe, sans-serif;
-  display: flex; 
-  flex-direction: column;
-  align-items: flex-start;
 }
 .configurator * {
   box-sizing: border-box;
