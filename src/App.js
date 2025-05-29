@@ -29,7 +29,7 @@ function transformItemToConfigOptions(item) {
 
     options[key] = {
       ...prop,
-      min: prop.min,
+      min: prop.min || 1,
       max: prop.max || 999,
       values: values.map((v, i) => ({
         title: v.title,
@@ -237,7 +237,7 @@ function App() {
                           ...config,
                           [key]: {
                             ...config[key],
-                            quantity: Math.max(property.min || 2, config[key].quantity - (property.chetnoe ? 2 : 1))
+                            quantity: Math.max(2, property.min || 2, config[key].quantity - (property.chetnoe ? 2 : 1))
                           }
                         })
                       }>-</div>
