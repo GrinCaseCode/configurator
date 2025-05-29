@@ -223,7 +223,7 @@ function App() {
                         updateConfig(index, { ...config, [key]: newIndex });
                       }
                     }}
-                  >
+                  > 
                     {property.values.map((opt, idx) => (
                       <option key={idx} value={idx}>
                         {opt.title} {(opt.priceRaw && parseInt(opt.priceRaw) !== 0) ? `+ ${opt.price} руб.` : ''}
