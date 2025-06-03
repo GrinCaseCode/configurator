@@ -14,14 +14,14 @@ function transformItemToConfigOptions(item) {
     if (key === 'DISKS') {
       values = values.filter(v => v.title.toLowerCase() !== 'выберите значение');
     }
-
+ 
     if ( 
       key !== 'RAM' &&
       values.length > 0 &&
       parseInt(values[0].price || '0') !== 0
     ) {
       values.unshift({  
-        title: 'Нет',
+        title: 'Нет', 
         price: 0, 
         value: 0
       });
@@ -47,6 +47,8 @@ function transformItemToConfigOptions(item) {
 
 function App() {
   const [configData, setConfigData] = useState([]);
+
+  const [activeFilter, setActiveFilter] = useState(null);
 
   useEffect(() => {
     const rootDiv = document.getElementById('root');
@@ -78,7 +80,8 @@ function App() {
         basePrice: parseInt((item.PRICE || '').replace(/\s/g, '')) || 0,
         options,
         config: defaultConfig,
-        isModalOpen: false
+        isModalOpen: false,
+         FILTER: item.FILTER
       });
     }
 
@@ -341,8 +344,47 @@ function App() {
   return (
     <div className="App">
       <div className="container">
+      <div className="filter">
+        <div
+          className={`filter__btn ${activeFilter === 'CPU2' ? 'active' : ''}`}
+          onClick={() => setActiveFilter('CPU2')}
+        >
+          HPE cерверы с CPU2
+        </div>
+        <div
+          className={`filter__btn ${activeFilter === 'CPU4' ? 'active' : ''}`}
+          onClick={() => setActiveFilter('CPU4')}
+        >
+          HPE cерверы с CPU4
+        </div>
+        <div
+          className={`filter__btn ${activeFilter === 'GPU' ? 'active' : ''}`}
+          onClick={() => setActiveFilter('GPU')}
+        >
+          HPE cерверы с GPU
+        </div>
+        <div
+          className={`filter__btn ${activeFilter === 'MICRO' ? 'active' : ''}`}
+          onClick={() => setActiveFilter('MICRO')}
+        >
+          MICRO STORAGE
+        </div>
+        <div
+          className="filter__btn"
+          onClick={() => setActiveFilter(null)}
+        >
+          Сбросить
+        </div>
+      </div>
         <div className="row-main">
-          {configData.map((item, index) => renderConfigurator(item, index))}
+        {configData
+  .filter(item => {
+    if (!activeFilter) return true;
+    if (!item.FILTER) return false;
+    const filters = item.FILTER.split(' ');
+    return filters.includes(activeFilter);
+  })
+  .map((item, index) => renderConfigurator(item, index))}
         </div>
       </div>
     </div>

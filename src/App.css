@@ -304,6 +304,31 @@ input::-webkit-inner-spin-button {
   padding: 50px 15px;
   margin: 0 auto;
 } 
+.filter {
+    display: flex;
+    gap: 25px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    max-width: 800px;
+    margin: 0 auto;
+    margin-bottom: 40px;
+}
+.filter__btn {
+    width: 30%;
+    max-width: 200px;
+    display: block;
+    text-align: center;
+    cursor: pointer;
+    background-color: #343644;
+    color: white;
+    padding: 15px 10px;
+    font-size: 18px;
+}
+.filter__btn.active {
+    background-color: #ffaa06;
+    color: black;
+}
 
 @media only screen and (max-width : 992px) {
   .row-main .configurator {
@@ -342,4 +367,12 @@ input::-webkit-inner-spin-button {
   .row-main .configurator {
     width: 100%;
   }
+  .filter {
+    gap: 10px;
+  }
+  .filter__btn {
+    width: 43%;
+    padding: 10px 8px;
+    font-size: 15px;
 }
+} 
