@@ -310,24 +310,53 @@ input::-webkit-inner-spin-button {
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    max-width: 800px;
+    max-width: 750px;
     margin: 0 auto;
     margin-bottom: 40px;
 }
 .filter__btn {
     width: 30%;
-    max-width: 200px;
+    max-width: 170px;
     display: block;
     text-align: center;
     cursor: pointer;
     background-color: #343644;
     color: white;
     padding: 15px 10px;
-    font-size: 18px;
+    font-size: 20px;
+    transition: all 0.3s;
 }
 .filter__btn.active {
     background-color: #ffaa06;
     color: black;
+}
+.term {
+  gap: 25px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+}
+.term__btn {
+  height: 42px;
+  background-color: #343644;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-align: center;
+  flex: 1;
+  transition: all 0.3s;
+}
+.term__btn.active {
+    background-color: #ffaa06;
+    color: #000;
+}
+.term__btn small {
+  font-size: 12px;
+  margin-left: 4px;
+  top: 1px;
+  position: relative;
+  color: red;
 }
 
 @media only screen and (max-width : 992px) {

@@ -24,11 +24,11 @@ function transformItemToConfigOptions(item) {
         title: 'Нет', 
         price: 0, 
         value: 0
-      });
+      }); 
     }
 
     options[key] = {
-      ...prop,
+      ...prop, 
       min: prop.min || 1,
       max: prop.max || 999,
       values: values.map((v, i) => ({
@@ -37,7 +37,7 @@ function transformItemToConfigOptions(item) {
         priceRaw: v.price,
         value: i,
         count: v.count ? parseInt(v.count) : null,
-        unitValue: v.value ? parseInt(v.value) : null
+        unitValue: v.value ? parseInt(v.value) : null 
       }))
     };
   }
@@ -81,7 +81,8 @@ function App() {
         options,
         config: defaultConfig,
         isModalOpen: false,
-         FILTER: item.FILTER
+        FILTER: item.FILTER,
+        term: '1m'
       });
     }
 
@@ -94,6 +95,12 @@ function App() {
     );
   };
 
+  const updateTerm = (index, newTerm) => {
+  setConfigData(prev =>
+    prev.map((item, i) => i === index ? { ...item, term: newTerm } : item)
+  );
+};
+
   const setIsModalOpen = (index, open) => {
     setConfigData(prev =>
       prev.map((item, i) => i === index ? { ...item, isModalOpen: open } : item)
@@ -101,7 +108,7 @@ function App() {
   };
 
   const calcTotal = (item) => {
-    const { config, options, basePrice } = item;
+    const { config, options, basePrice, term } = item;
     let total = basePrice;
 
     for (const [key, prop] of Object.entries(options)) {
@@ -120,6 +127,10 @@ function App() {
       } else {
         total += prop.values[config[key]]?.price || 0;
       }
+    }
+
+     if (term === '12m') {
+      total = Math.round(total * 0.85);
     }
 
     return total;
@@ -196,6 +207,20 @@ function App() {
           <img src={image} alt={name} />
           <h1 className="configurator__title">{name}</h1>
         </div>
+       <div className="term">
+        <div
+          className={`term__btn ${item.term === '1m' ? 'active' : ''}`}
+          onClick={() => updateTerm(index, '1m')}
+        >
+          1 мес.
+        </div>
+        <div
+          className={`term__btn ${item.term === '12m' ? 'active' : ''}`}
+          onClick={() => updateTerm(index, '12m')}
+        >
+          12 мес. <small>-15%</small>
+        </div>
+      </div>
         <div className="configurator__content">
           {Object.entries(options).map(([key, property]) => {
             if (property.multiple) return renderMultiple(key, property);
@@ -347,33 +372,39 @@ function App() {
       <div className="filter">
         <div
           className={`filter__btn ${activeFilter === 'CPU2' ? 'active' : ''}`}
-          onClick={() => setActiveFilter('CPU2')}
+          onClick={() => setActiveFilter(prev => prev === 'CPU2' ? null : 'CPU2')}
         >
-          HPE cерверы с CPU2
+          HPE cерверы с 2 CPU
         </div>
         <div
           className={`filter__btn ${activeFilter === 'CPU4' ? 'active' : ''}`}
-          onClick={() => setActiveFilter('CPU4')}
+          onClick={() => setActiveFilter(prev => prev === 'CPU4' ? null : 'CPU4')}
         >
-          HPE cерверы с CPU4
+          HPE cерверы с 4 CPU
         </div>
         <div
           className={`filter__btn ${activeFilter === 'GPU' ? 'active' : ''}`}
-          onClick={() => setActiveFilter('GPU')}
+          onClick={() => setActiveFilter(prev => prev === 'GPU' ? null : 'GPU')}
         >
-          HPE cерверы с GPU
+         HPE cерверы с GPU
         </div>
         <div
-          className={`filter__btn ${activeFilter === 'MICRO' ? 'active' : ''}`}
-          onClick={() => setActiveFilter('MICRO')}
+          className={`filter__btn ${activeFilter === 'MICROSERVERS' ? 'active' : ''}`}
+          onClick={() => setActiveFilter(prev => prev === 'MICROSERVERS' ? null : 'MICROSERVERS')}
         >
-          MICRO STORAGE
+          Микросерверы HPE
         </div>
         <div
-          className="filter__btn"
-          onClick={() => setActiveFilter(null)}
+          className={`filter__btn ${activeFilter === 'STORAGE' ? 'active' : ''}`}
+          onClick={() => setActiveFilter(prev => prev === 'STORAGE' ? null : 'STORAGE')}
         >
-          Сбросить
+          HPE cерверы для хранения
+        </div>
+        <div
+          className={`filter__btn ${activeFilter === 'LUN_SHD' ? 'active' : ''}`}
+          onClick={() => setActiveFilter(prev => prev === 'LUN_SHD' ? null : 'LUN_SHD')}
+        >
+          Луны на СХД HPE 3PAR
         </div>
       </div>
         <div className="row-main">
