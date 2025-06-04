@@ -298,6 +298,7 @@ input::-webkit-inner-spin-button {
   width: 33.3333%;
   margin: 0;
   margin-bottom: 30px;
+  box-sizing: border-box;
 }
 .container {
   max-width: 1000px;

@@ -136,7 +136,9 @@ function App() {
     return total;
   };
 
-  const renderConfigurator = (item, index) => {
+  const renderConfigurator = (item) => {
+    const index = configData.findIndex(c => c.id === item.id);
+ 
     const { name, image, options, config, isModalOpen } = item;
 
     const renderMultiple = (key, property) => {
@@ -369,7 +371,7 @@ function App() {
   return (
     <div className="App">
       <div className="container">
-      <div className="filter">
+      <div className="filter"> 
         <div
           className={`filter__btn ${activeFilter === 'CPU2' ? 'active' : ''}`}
           onClick={() => setActiveFilter(prev => prev === 'CPU2' ? null : 'CPU2')}
@@ -409,13 +411,13 @@ function App() {
       </div>
         <div className="row-main">
         {configData
-  .filter(item => {
-    if (!activeFilter) return true;
-    if (!item.FILTER) return false;
-    const filters = item.FILTER.split(' ');
-    return filters.includes(activeFilter);
-  })
-  .map((item, index) => renderConfigurator(item, index))}
+          .filter(item => {
+            if (!activeFilter) return true;
+            if (!item.FILTER) return false;
+            const filters = item.FILTER.split(' ');
+            return filters.includes(activeFilter);
+          })
+          .map(item => renderConfigurator(item))}
         </div>
       </div>
     </div>
