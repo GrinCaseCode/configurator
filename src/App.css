@@ -282,7 +282,8 @@ input::-webkit-inner-spin-button {
   align-items: flex-start;
   justify-content: center;
   overflow: auto;
-  background: rgba(0, 0, 0, .5);
+  background: rgba(0, 0, 0, .5); 
+  z-index: 100;
 }
 .no-scroll {
   overflow: hidden;
