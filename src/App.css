@@ -47,6 +47,7 @@
   color: #8f919b;
   display: block;
 }
+.single-option,
 .configurator__item select {
   height: 30px;
   background: #292b37;
@@ -56,6 +57,12 @@
   font-weight: 400;
   cursor: pointer;
   width: 100%;
+}
+.single-option {
+  padding: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .configurator__item p {
   margin: 0;
@@ -79,6 +86,7 @@
   background: transparent;
   border: 1px solid rgb(118, 118, 118);
   line-height: 30px;
+  flex: none;
 }
 .quantity input {
   flex: 1;

@@ -155,7 +155,12 @@
                 "code": "DISKS2",
                 "chetnoe": false,
                 "multiple": true,
+                "max": 1,
                 "values": [
+                {
+                        "price": 0,
+                        "title": "Нет"
+                    },
                     {
                         "price": 8499,
                         "title": "HPE StorageWorks D2220sb"
@@ -165,7 +170,8 @@
             "DISKS3": {
                 "name": "Диски 3",
                 "code": "DISKS3",
-                "chetnoe": false,
+                "chetnoe": false, 
+                "dependence": "DISKS2",
                 "multiple": true,
                 "values": [
                     {
@@ -418,6 +424,7 @@
                 "name": "Диски 3",
                 "code": "DISKS3",
                 "chetnoe": false,
+                "dependence": "DISKS2",
                 "multiple": true,
                 "values": [
                     {
@@ -656,8 +663,9 @@
             },
             "DISKS3": {
                 "name": "Диски 3",
-                "code": "DISKS3",
+                "code": "DISKS3", 
                 "chetnoe": false,
+                "dependence": "DISKS2",
                 "multiple": true,
                 "values": [
                     {
