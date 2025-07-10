@@ -60,9 +60,10 @@
 }
 .single-option {
   padding: 5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  cursor: initial;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .configurator__item p {
   margin: 0;
