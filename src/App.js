@@ -9,7 +9,7 @@ function transformItemToConfigOptions(item) {
   for (const [key, prop] of Object.entries(props)) {
     if (!Array.isArray(prop.values)) continue;
 
-    let values = [...prop.values];
+    let values = [...prop.values]; 
 
     if (key === 'DISKS') {
       values = values.filter(v => v.title.toLowerCase() !== 'выберите значение');
@@ -90,6 +90,8 @@ function App() {
     setConfigData(configs);
   }, []);
 
+
+
   const updateConfig = (index, newConfig) => {
     setConfigData(prev =>
       prev.map((item, i) => i === index ? { ...item, config: newConfig } : item)
@@ -137,25 +139,43 @@ function App() {
     return total;
   };
 
+  const calcFullPrice = (item) => {
+  const monthly = calcTotal(item);
+  return item.term === '12m' ? monthly * 12 : monthly;
+};
+
   const renderConfigurator = (item) => {
     const index = configData.findIndex(c => c.id === item.id);
     const { name, image, options, config, isModalOpen } = item;
 
     const renderMultiple = (key, property) => {
-      const totalQuantity = config[key].reduce((sum, item) => sum + item.quantity, 0);
-      const canAddMore = totalQuantity < property.max;
-      const selectedIndex = config[key]?.selectedIndex ?? config[key];
+  const totalQuantity = config[key].reduce((sum, item) => sum + item.quantity, 0);
+  const canAddMore = totalQuantity < property.max;
 
-      return (
-        <label className="configurator__item" key={key}>
-          <p>{property.name}</p>
-          {config[key].map((itemValue, i) => (
-            <div className="configurator__line" key={i}>
+
+
+  return (
+    <label className="configurator__item" key={key}>
+      <p>{property.name}</p>
+      {config[key].map((itemValue, i) => (
+        <div className="configurator__line" key={i}>
+          {(() => {
+      const opt = property.values[itemValue.index];
+      const unit = opt?.unitValue || 0;
+      const qty = itemValue.quantity;
+      const total = unit * qty;
+      return total > 0 ? (
+        <div className="configurator__sum">{total} GB</div>
+      ) : null;
+    })()}
               {property.values.length === 1 ? (
-                <div className="single-option">{property.values[0].title}</div>
+                <div className="single-option" title={property.values[0].title}>
+                  {property.values[0].title}
+                </div>
               ) : (
                 <select
                   value={itemValue.index}
+                   title={property.values[0].title}
                   onChange={(e) => {
                     const updated = [...config[key]];
                     updated[i].index = +e.target.value;
@@ -170,14 +190,18 @@ function App() {
                 </select>
               )}
 
-
-              {property.max > 1 && (
+              {property.max > 1 && property.values[itemValue.index]?.title?.toLowerCase() !== 'нет' && (
                 <div className="quantity">
-                  <div className="quantity__btn" onClick={() => {
-                    const updated = [...config[key]];
-                    updated[i].quantity = Math.max(property.min, updated[i].quantity - 1);
-                    updateConfig(index, { ...config, [key]: updated });
-                  }}>-</div>
+                  <div
+                    className="quantity__btn"
+                    onClick={() => {
+                      const updated = [...config[key]];
+                      updated[i].quantity = Math.max(property.min, updated[i].quantity - 1);
+                      updateConfig(index, { ...config, [key]: updated });
+                    }}
+                  >
+                    -
+                  </div>
                   <input type="number" value={itemValue.quantity} readOnly />
                   <div
                     className={`quantity__btn ${totalQuantity >= property.max ? 'disabled' : ''}`}
@@ -188,7 +212,9 @@ function App() {
                         updateConfig(index, { ...config, [key]: updated });
                       }
                     }}
-                  >+</div>
+                  >
+                    +
+                  </div>
                 </div>
               )}
 
@@ -201,22 +227,28 @@ function App() {
             </div>
           ))}
 
-          {property.max > 1 && (
-            <div className={`btn-add-line ${!canAddMore ? 'disabled' : ''}`}
-              onClick={() => {
-                if (canAddMore) {
-                  updateConfig(index, {
-                    ...config,
-                    [key]: [...config[key], { index: 0, quantity: property.min }]
-                  });
-                }
-              }}>
-              <strong>+</strong> Добавить ещё
-            </div>
+
+          {property.max > 1 &&
+            config[key].every(d => property.values[d.index]?.title?.toLowerCase() !== 'нет') && (
+              <div
+                className={`btn-add-line ${!canAddMore ? 'disabled' : ''}`}
+                onClick={() => {
+                  if (canAddMore) {
+                    updateConfig(index, {
+                      ...config,
+                      [key]: [...config[key], { index: 0, quantity: property.min }]
+                    });
+                  }
+                }}
+              >
+                <strong>+</strong> Добавить ещё
+              </div>
           )}
+
         </label>
       );
     };
+
 
     return (
       <div className="configurator" key={item.id}>
@@ -279,10 +311,11 @@ function App() {
                     <div className="configurator__sum">{totalValue} GB</div>
                   )}
                   {property.values.length === 1 ? (
-                    <div className="single-option">{property.values[0].title}</div>
+                    <div className="single-option" title={property.values[0].title}>{property.values[0].title}</div>
                   ) : (
                     <select
                       value={selectedIndex}
+                       title={property.values[0].title}
                       onChange={(e) => {
                         const newIndex = parseInt(e.target.value, 10);
                         if (property.count || key === 'RAM') {
@@ -296,7 +329,7 @@ function App() {
                       }}
                     >
                       {property.values.map((opt, idx) => (
-                        <option key={idx} value={idx}>
+                        <option key={idx} value={idx} title={opt.title}>
                           {opt.title} {(opt.priceRaw && parseInt(opt.priceRaw) !== 0) ? `+ ${opt.price} руб.` : ''}
                         </option>
                       ))}
@@ -342,49 +375,82 @@ function App() {
               <div className="modal__close" onClick={() => setIsModalOpen(index, false)}>×</div>
               <div className="modal__title">Форма заказа</div>
               <div className="modal__feature"><strong>{name}</strong></div>
-              {Object.entries(options).map(([key, property]) => {
+             {Object.entries(options).map(([key, property]) => {
                 if (!property.values) return null;
+
+                if (property.dependence) {
+                  const depKey = property.dependence;
+                  const depProp = options[depKey];
+                  const depConfig = config[depKey];
+
+                  let hasNet = false;
+
+                  if (depProp.multiple && Array.isArray(depConfig)) {
+                    hasNet = depConfig.some(d => {
+                      const val = depProp.values?.[d.index]?.title?.toLowerCase();
+                      return val === 'нет';
+                    });
+                  } else {
+                    const selectedIndex = depConfig?.selectedIndex ?? depConfig;
+                    const val = depProp.values?.[selectedIndex]?.title?.toLowerCase();
+                    hasNet = val === 'нет';
+                  }
+
+                  if (hasNet) return null;
+                }
 
                 if (property.multiple) {
                   const selected = config[key].filter(d => {
                     const opt = property.values[d.index];
-                    return opt && opt.title.toLowerCase() !== "выберите значение";
+                    return opt && opt.title.toLowerCase() !== "нет";
                   });
+
+                  if (selected.length === 0) return null;
+
                   return (
                     <div className="modal__feature" key={key}>
                       <span>{property.name}:</span>{' '}
-                      {selected.length === 0
-                        ? 'Нет'
-                        : selected.map((d, i) => {
-                          const item = property.values[d.index];
-                          return (
-                            <div key={i}>
-                              {item?.title || 'Не выбрано'} × {d.quantity} шт.
-                            </div>
-                          );
-                        })}
+                      {selected.map((d, i) => {
+                        const item = property.values[d.index];
+                        if (!item || item.title.toLowerCase() === 'нет') return null;
+
+                        return (
+                          <div key={i}>
+                            {item.title}
+                            {d.quantity > 1 ? ` × ${d.quantity} шт.` : ''}
+                          </div>
+                        );
+                      })}
                     </div>
                   );
                 }
 
                 if (property.count || key === 'RAM') {
                   const selected = property.values[config[key].selectedIndex];
+                  if (!selected || selected.title.toLowerCase() === 'нет') return null;
+
                   return (
                     <div className="modal__feature" key={key}>
                       <span>{property.name}:</span>{' '}
-                      {selected?.title || 'Нет'} × {config[key].quantity} шт.
+                      {selected.title}{config[key].quantity > 1 ? ` × ${config[key].quantity} шт.` : ''}
                     </div>
                   );
                 }
 
                 const selected = property.values[config[key]];
+                if (!selected || selected.title.toLowerCase() === 'нет') return null;
+
                 return (
                   <div className="modal__feature" key={key}>
-                    <span>{property.name}:</span> {selected?.title || 'Нет'}
+                    <span>{property.name}:</span> {selected.title}
                   </div>
                 );
               })}
-              <div className="result-price">Итоговая сумма: <strong>{calcTotal(item)} руб.</strong></div>
+
+
+              <div className="result-price">
+               Итоговая сумма: <strong>{calcFullPrice(item)} руб.</strong>
+            </div>
               <form>
                 <div className="item-form"><input type="text" required placeholder="Имя" /></div>
                 <div className="item-form"><input type="email" required placeholder="E-mail" /></div>

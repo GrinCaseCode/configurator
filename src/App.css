@@ -370,6 +370,27 @@ input::-webkit-inner-spin-button {
   color: red;
 }
 
+.tooltip-text {
+  position: absolute;
+  left: 0;
+  z-index: 10;
+  width: max-content;
+  max-width: 300px;
+  display: block;
+  background-color: #343644;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  white-space: normal;
+  word-break: break-word;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+
 @media only screen and (max-width : 992px) {
   .row-main .configurator {
     width: 50%;
