@@ -51,6 +51,10 @@ function App() {
   const [configData, setConfigData] = useState([]);
   const [activeFilter, setActiveFilter] = useState(null);
 
+  const countValidOptions = (property) => {
+    return property.values.filter(v => v.title.toLowerCase() !== 'нет').length;
+  };
+
   useEffect(() => {
     const rootDiv = document.getElementById('root');
     const jsonString = rootDiv?.getAttribute('data-parameters');
@@ -169,13 +173,15 @@ function App() {
       ) : null;
     })()}
               {property.values.length === 1 ? (
-                <div className="single-option" title={property.values[0].title}>
+                <div className="single-option"
+                 title={`${property.values[itemValue.index].title} Цена: ${property.values[itemValue.index0].price} руб.`}
+                 >
                   {property.values[0].title}
                 </div>
               ) : (
                 <select
                   value={itemValue.index}
-                   title={property.values[0].title}
+                    title={`${property.values[itemValue.index].title} Цена: ${property.values[itemValue.index].price} руб.`}
                   onChange={(e) => {
                     const updated = [...config[key]];
                     updated[i].index = +e.target.value;
@@ -228,22 +234,30 @@ function App() {
           ))}
 
 
-          {property.max > 1 &&
-            config[key].every(d => property.values[d.index]?.title?.toLowerCase() !== 'нет') && (
-              <div
-                className={`btn-add-line ${!canAddMore ? 'disabled' : ''}`}
-                onClick={() => {
-                  if (canAddMore) {
-                    updateConfig(index, {
-                      ...config,
-                      [key]: [...config[key], { index: 0, quantity: property.min }]
-                    });
-                  }
-                }}
-              >
-                <strong>+</strong> Добавить ещё
-              </div>
-          )}
+           {property.max > 1 &&
+                    config[key].length < countValidOptions(property) &&
+                    config[key].reduce((sum, it) => sum + it.quantity, 0) < property.max && (
+                      <div
+                        className="btn-add-line"
+                        onClick={() => {
+                          const totalQty = config[key].reduce((sum, it) => sum + it.quantity, 0);
+                          if (totalQty < property.max) {
+                            const firstValidIndex = property.values.findIndex(
+                              v => v.title.toLowerCase() !== 'нет'
+                            );
+                            updateConfig(index, {
+                              ...config,
+                              [key]: [...config[key], {
+                                index: firstValidIndex !== -1 ? firstValidIndex : 0,
+                                quantity: property.min
+                              }]
+                            });
+                          }
+                        }}
+                      >
+                        <strong>+</strong> Добавить ещё
+                      </div>
+                    )}
 
         </label>
       );
@@ -311,11 +325,15 @@ function App() {
                     <div className="configurator__sum">{totalValue} GB</div>
                   )}
                   {property.values.length === 1 ? (
-                    <div className="single-option" title={property.values[0].title}>{property.values[0].title}</div>
+                    <div className="single-option" 
+                     title={`${property.values[selectedIndex].title} Цена: ${property.values[selectedIndex].price} руб.`}
+                    >
+                      {property.values[0].title}
+                      </div>
                   ) : (
                     <select
                       value={selectedIndex}
-                       title={property.values[0].title}
+                      title={`${property.values[selectedIndex].title} Цена: ${property.values[selectedIndex].price} руб.`}
                       onChange={(e) => {
                         const newIndex = parseInt(e.target.value, 10);
                         if (property.count || key === 'RAM') {
@@ -449,8 +467,8 @@ function App() {
 
 
               <div className="result-price">
-               Итоговая сумма: <strong>{calcFullPrice(item)} руб.</strong>
-            </div>
+                Арендная плата в месяц: <strong>{calcTotal(item)} руб.</strong>
+              </div>
               <form>
                 <div className="item-form"><input type="text" required placeholder="Имя" /></div>
                 <div className="item-form"><input type="email" required placeholder="E-mail" /></div>
